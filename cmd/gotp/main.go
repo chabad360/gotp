@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -12,9 +13,9 @@ import (
 	"sync"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/knadh/stuffbin"
 	"github.com/r3labs/sse"
 	flag "github.com/spf13/pflag"
+
 	"github.com/vividvilla/gotp"
 )
 
@@ -41,6 +42,9 @@ var (
 	gotpCfg       gotp.Config
 	buildString   = "unknown"
 	nodeFieldRe   = regexp.MustCompile(`{{(?:\s+)?(\.[\w]+)(?:\s+)?}}`)
+
+	//go:embed index.html
+	html []byte
 )
 
 // Resp represents JSON response structure.
@@ -151,26 +155,26 @@ func binPath() (string, error) {
 	return path, nil
 }
 
-func initFileSystem() (stuffbin.FileSystem, error) {
-	path, err := binPath()
-	if err != nil {
-		return nil, fmt.Errorf("error getting binary path: %v", err.Error())
-	}
-
-	// Read stuffed data from self.
-	fs, err := stuffbin.UnStuff(path)
-	if err != nil {
-		if err == stuffbin.ErrNoID {
-			fs, err = stuffbin.NewLocalFS("/", "./", "../assets/index.html:/assets/index.html")
-			if err != nil {
-				return fs, fmt.Errorf("error falling back to local filesystem: %v", err)
-			}
-		} else {
-			return fs, fmt.Errorf("error reading stuffed binary: %v", err)
-		}
-	}
-	return fs, nil
-}
+//func initFileSystem() (stuffbin.FileSystem, error) {
+//	path, err := binPath()
+//	if err != nil {
+//		return nil, fmt.Errorf("error getting binary path: %v", err.Error())
+//	}
+//
+//	// Read stuffed data from self.
+//	fs, err := stuffbin.UnStuff(path)
+//	if err != nil {
+//		if err == stuffbin.ErrNoID {
+//			fs, err = stuffbin.NewLocalFS("/", "./", "../assets/index.html:/assets/index.html")
+//			if err != nil {
+//				return fs, fmt.Errorf("error falling back to local filesystem: %v", err)
+//			}
+//		} else {
+//			return fs, fmt.Errorf("error reading stuffed binary: %v", err)
+//		}
+//	}
+//	return fs, nil
+//}
 
 func decodeTemplateData(dataRaw []byte) (map[string]interface{}, error) {
 	var data map[string]interface{}
@@ -263,11 +267,11 @@ func main() {
 	}
 
 	// Initialize file system.
-	fs, err := initFileSystem()
-	if err != nil {
-		log.Printf("error initializing file system: %v", err)
-		os.Exit(1)
-	}
+	//fs, err := initFileSystem()
+	//if err != nil {
+	//	log.Printf("error initializing file system: %v", err)
+	//	os.Exit(1)
+	//}
 
 	// Initialize file watcher.
 	paths := append(baseTmplPaths, tmplPath)
@@ -287,14 +291,14 @@ func main() {
 	mux.HandleFunc("/events", server.HTTPHandler)
 	// Server index.html page.
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		f, err := fs.Get("/assets/index.html")
-		if err != nil {
-			log.Fatalf("error reading foo.txt: %v", err)
-		}
+		//f, err := fs.Get("/assets/index.html")
+		//if err != nil {
+		//	log.Fatalf("error reading foo.txt: %v", err)
+		//}
 		// Write response.
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "text/html")
-		w.Write(f.ReadBytes())
+		w.Write(html)
 	})
 
 	// Handler to render template.

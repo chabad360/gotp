@@ -3,7 +3,6 @@ package gotp
 import (
 	"bytes"
 	"html/template"
-	"path/filepath"
 	"text/template/parse"
 
 	"github.com/Masterminds/sprig"
@@ -55,11 +54,11 @@ func GetTemplate(cfg Config, tmpl string, baseTmplPaths []string) (*template.Tem
 	if err != nil {
 		return t, err
 	}
-
-	// From loaded templates get target template.
-	// Loaded templates are referenced against the filename instead of full path,
-	// so get the filename of the target template and load from registered templates.
-	name := filepath.Base(tmpl)
+	//
+	//// From loaded templates get target template.
+	//// Loaded templates are referenced against the filename instead of full path,
+	//// so get the filename of the target template and load from registered templates.
+	//name := filepath.Base(tmpl)
 	return t, nil
 }
 
