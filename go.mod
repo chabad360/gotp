@@ -1,4 +1,4 @@
-module github.com/vividvilla/gotp
+module github.com/chabad360/gotp
 
 go 1.18
 
