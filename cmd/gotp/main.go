@@ -16,7 +16,7 @@ import (
 	"github.com/r3labs/sse"
 	flag "github.com/spf13/pflag"
 
-	"github.com/vividvilla/gotp"
+	"github.com/chabad360/gotp"
 )
 
 const helpTxt = `
